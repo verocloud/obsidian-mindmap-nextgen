@@ -264,7 +264,7 @@ export default class MindmapView extends ItemView {
 
   async transformMarkdown(markdown: string) {
     let { root, features, frontmatter } = this.transformer.transform(markdown);
-console.log('root', root)
+
     const rootWithTitle =
       !this.settings.titleAsRootNode ? root :
       root.content == "" ? { ...root, content: this.file.basename } :
