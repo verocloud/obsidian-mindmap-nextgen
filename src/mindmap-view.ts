@@ -264,11 +264,16 @@ export default class MindmapView extends ItemView {
 
   async transformMarkdown(markdown: string) {
     let { root, features, frontmatter } = this.transformer.transform(markdown);
+console.log('root', root)
+    const rootWithTitle =
+      !this.settings.titleAsRootNode ? root :
+      root.content == "" ? { ...root, content: this.file.basename } :
+      { content: this.file.basename, children: [root], type: 'heading', depth: 0 }
 
     const { scripts, styles } = this.transformer.getUsedAssets(features);
 
     this.obsMarkmap.updateInternalLinks(root);
-    return { root, scripts, styles, frontmatter };
+    return { root: rootWithTitle, scripts, styles, frontmatter };
   }
 
   applyColor(frontmatterColors: string[]) {
