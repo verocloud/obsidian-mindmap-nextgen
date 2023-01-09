@@ -3,11 +3,27 @@ import { App, PluginSettingTab, Setting, SplitDirection } from "obsidian";
 import MindMap from "./main";
 import { ScreenshotBgStyle } from "./@types/screenshot";
 
+type ColorSettings = Record<number | 'default', Setting>
+
 export class MindMapSettingsTab extends PluginSettingTab {
   plugin: MindMap;
+  colorSettings: ColorSettings;
   constructor(app: App, plugin: MindMap) {
     super(app, plugin);
     this.plugin = plugin;
+    this.colorSettings = {} as ColorSettings;
+  }
+
+  decideDisplayColors() {
+    const approach = this.plugin.settings.coloring;
+    const colors = this.colorSettings;
+    const options = {
+      branch: [] as Setting[],
+      depth: [colors[1], colors[2], colors[3], colors.default],
+      single: [colors.default]
+    };
+    Object.values(this.colorSettings).forEach(setting => setting.settingEl.hidden = true);
+    options[approach].forEach(setting => setting.settingEl.hidden = false);
   }
 
   display(): void {
@@ -113,22 +129,24 @@ export class MindMapSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Coloring approach")
-      .setDesc(
-        "The 'depth' changes the color on each level, 'branch' changes the color on each new branch"
-      )
-      .addDropdown((dropDown) =>
-        dropDown
-          .addOption("depth", "Depth based coloring")
-          .addOption("branch", "Branch based coloring")
-          .setValue(this.plugin.settings.coloring || "depth")
-          .onChange((value: "branch" | "depth") => {
-            this.plugin.settings.coloring = value;
-            save();
-          })
-      );
+    .setName("Coloring approach")
+    .setDesc(
+      "The 'depth' changes the color on each level, 'branch' changes the color on each new branch"
+    )
+    .addDropdown((dropDown) =>
+      dropDown
+        .addOption("depth", "Depth based coloring")
+        .addOption("branch", "Branch based coloring")
+        .addOption("single", "Single color")
+        .setValue(this.plugin.settings.coloring || "depth")
+        .onChange((value: "branch" | "depth" | "single") => {
+          this.plugin.settings.coloring = value;
+          save();
+          this.decideDisplayColors();
+        })
+    );
 
-    new Setting(containerEl)
+    this.colorSettings[1] = new Setting(containerEl)
       .setName("Color 1")
       .setDesc("Color for the first level of the mind map")
       .addColorPicker((colPicker) =>
@@ -154,7 +172,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
-    new Setting(containerEl)
+    this.colorSettings[2] = new Setting(containerEl)
       .setName("Color 2")
       .setDesc("Color for the second level of the mind map")
       .addColorPicker((colPicker) =>
@@ -178,7 +196,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
-    new Setting(containerEl)
+    this.colorSettings[3] = new Setting(containerEl)
       .setName("Color 3")
       .setDesc("Color for the third level of the mind map")
       .addColorPicker((colPicker) =>
@@ -202,7 +220,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           })
       );
 
-    new Setting(containerEl)
+    this.colorSettings.default = new Setting(containerEl)
       .setName("Default Color")
       .setDesc("Color for fourth level and beyond")
       .addColorPicker((colPicker) =>
@@ -222,18 +240,6 @@ export class MindMapSettingsTab extends PluginSettingTab {
           .setValue(this.plugin.settings.defaultColorThickness)
           .onChange((value) => {
             this.plugin.settings.defaultColorThickness = value;
-            save();
-          })
-      );
-
-    new Setting(containerEl)
-      .setName("Only use default color")
-      .setDesc("When on, all branches uses the default color")
-      .addToggle((toggle) =>
-        toggle
-          .setValue(this.plugin.settings.onlyUseDefaultColor)
-          .onChange((value) => {
-            this.plugin.settings.onlyUseDefaultColor = value;
             save();
           })
       );
@@ -369,5 +375,7 @@ export class MindMapSettingsTab extends PluginSettingTab {
           save();
         })
       );
+
+    this.decideDisplayColors();
   }
 }
