@@ -14,17 +14,17 @@ const DEFAULT_SETTINGS = {
   spacingVertical: 5,
   spacingHorizontal: 80,
   paddingX: 8,
-  color1: "#fed766",
-  color1Thickness: "8",
+  color1: "#cb4b16",
+  color1Thickness: "3",
 
-  color2: "#2ab7ca",
-  color2Thickness: "6",
+  color2: "#6c71c4",
+  color2Thickness: "1.5",
 
-  color3: "#fe4a49",
-  color3Thickness: "4",
+  color3: "#859900",
+  color3Thickness: "1",
 
-  defaultColor: "#000",
-  defaultColorThickness: "2",
+  defaultColor: "#b58900",
+  defaultColorThickness: "1",
 
   initialExpandLevel: -1,
 
@@ -36,8 +36,8 @@ const DEFAULT_SETTINGS = {
   animationDuration: 500,
   maxWidth: 0,
   // below a beautiful dark blue color
-  screenshotBgColor: "#039614",
-  screenshotFgColor: "#ffffff",
+  screenshotBgColor: "#002b36",
+  screenshotFgColor: "#fdf6e3",
   screenshotFgColorEnabled: false,
   screenshotBgStyle: ScreenshotBgStyle.Transparent,
   screenshotTransparentBg: true,
