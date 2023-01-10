@@ -42,6 +42,27 @@ export default class MindmapView extends ItemView {
   hasFit: boolean;
   toolbar: HTMLElement;
 
+  constructor(settings: MindMapSettings, leaf: WorkspaceLeaf) {
+    super(leaf);
+    this.settings = settings;
+    this.workspace = this.app.workspace;
+
+    this.transformer = new Transformer([
+      ...builtInPlugins,
+      htmlEscapePlugin,
+      checkBoxPlugin,
+    ]);
+    this.svg = createSVG(this.containerEl, this.settings.lineHeight);
+
+    this.hasFit = false;
+
+    this.createMarkmapSvg();
+
+    this.createToolbar();
+
+    this.setListenersUp();
+  }
+
   getViewType(): string {
     return MM_VIEW_TYPE;
   }
@@ -88,27 +109,6 @@ export default class MindmapView extends ItemView {
       );
 
     menu.showAtPosition({ x: 0, y: 0 });
-  }
-
-  constructor(settings: MindMapSettings, leaf: WorkspaceLeaf) {
-    super(leaf);
-    this.settings = settings;
-    this.workspace = this.app.workspace;
-
-    this.transformer = new Transformer([
-      ...builtInPlugins,
-      htmlEscapePlugin,
-      checkBoxPlugin,
-    ]);
-    this.svg = createSVG(this.containerEl, this.settings.lineHeight);
-
-    this.hasFit = false;
-
-    this.createMarkmapSvg();
-
-    this.createToolbar();
-
-    this.setListenersUp();
   }
 
   createMarkmapSvg() {
@@ -226,22 +226,14 @@ export default class MindmapView extends ItemView {
 
       if (!markdown) return;
 
-      let { root, scripts, styles, frontmatter } = await this.transformMarkdown(
+      let { root, scripts, styles, markmap } = await this.transformMarkdown(
         markdown
       );
-
-      const actualFrontmatter = frontmatter as CustomFrontmatter;
-
-      const options = deriveOptions(frontmatter?.markmap);
-      this.frontmatterOptions = {
-        ...options,
-        screenshotFgColor: actualFrontmatter?.markmap?.screenshotFgColor,
-      };
 
       if (styles) loadCSS(styles);
       if (scripts) loadJS(scripts);
 
-      this.renderMarkmap(root, options, frontmatter?.markmap ?? {});
+      this.renderMarkmap(root, markmap.options, markmap.frontmatter);
 
       this.displayText =
         this.file.name != undefined
@@ -263,7 +255,8 @@ export default class MindmapView extends ItemView {
   }
 
   titleAsRootNode(root: INode) {
-    if (!this.settings.titleAsRootNode) return root
+    const isOn = this.settings.titleAsRootNode || this.frontmatterOptions?.titleAsRootNode
+    if (! isOn) return root
     if (root.content == "") return { ...root, content: this.file.basename }
     return { content: this.file.basename, children: [root], type: 'heading', depth: 0 }
   }
@@ -271,12 +264,30 @@ export default class MindmapView extends ItemView {
   async transformMarkdown(markdown: string) {
     let { root, features, frontmatter } = this.transformer.transform(markdown);
 
+    const actualFrontmatter = frontmatter as CustomFrontmatter;
+
+    const options = deriveOptions(frontmatter?.markmap);
+    this.frontmatterOptions = {
+      ...options,
+      screenshotFgColor: actualFrontmatter?.markmap?.screenshotFgColor,
+      titleAsRootNode: actualFrontmatter?.markmap?.titleAsRootNode
+    };
+
     const rootWithTitle = this.titleAsRootNode(root)
 
     const { scripts, styles } = this.transformer.getUsedAssets(features);
 
     this.obsMarkmap.updateInternalLinks(root);
-    return { root: rootWithTitle, scripts, styles, frontmatter };
+
+    return {
+      scripts,
+      styles,
+      root: rootWithTitle,
+      markmap: {
+        options,
+        frontmatter: frontmatter?.markmap || {}
+      }
+    };
   }
 
   applyColor(frontmatterColors: string[]) {
