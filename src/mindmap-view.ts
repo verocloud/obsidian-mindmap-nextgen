@@ -262,13 +262,16 @@ export default class MindmapView extends ItemView {
     }
   }
 
+  titleAsRootNode(root: INode) {
+    if (!this.settings.titleAsRootNode) return root
+    if (root.content == "") return { ...root, content: this.file.basename }
+    return { content: this.file.basename, children: [root], type: 'heading', depth: 0 }
+  }
+
   async transformMarkdown(markdown: string) {
     let { root, features, frontmatter } = this.transformer.transform(markdown);
 
-    const rootWithTitle =
-      !this.settings.titleAsRootNode ? root :
-      root.content == "" ? { ...root, content: this.file.basename } :
-      { content: this.file.basename, children: [root], type: 'heading', depth: 0 }
+    const rootWithTitle = this.titleAsRootNode(root)
 
     const { scripts, styles } = this.transformer.getUsedAssets(features);
 
