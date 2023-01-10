@@ -162,6 +162,10 @@ Places a copy of the Mind Map SVG on your clipboard allowing you to paste it int
 
 Hides all nodes except the root.
 
+### Document title as root node
+
+Select "Use title as root node" in plugin settings to generate mind maps with the title at the bottom level, so you can avoid repeating the title.
+
 ## Compatibility
 
 The obsidian version I have tested is **v1.0.3**, which is recommended to use at least version **v1.0.0**.
