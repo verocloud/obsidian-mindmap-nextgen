@@ -56,7 +56,7 @@ The colors you list will always be used, no matter which coloring approach is se
 
 It is also good to note that the frontmatter only works for that markdown it is in. If you open another Markdown file without frontmatter, the settings from settings tab will be used.
 
-More than the default frontmatter options, it also supports another options (and may be upcomming more options):
+As well as the default frontmatter options, it also supports these other options (and maybe more soon):
 
 **screenshotFgColor:** Is an option that allows you to set the foreground color of the screenshot. It accepts any valid CSS color (hex, color name, rgb, rgba and hsl). It's nice to remember that this color is applied to screenshot only, and not while using the plugin.
 
