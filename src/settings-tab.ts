@@ -369,5 +369,17 @@ export class MindMapSettingsTab extends PluginSettingTab {
           save();
         })
       );
+
+    new Setting(containerEl)
+    .setName("Use title as root node")
+    .setDesc(
+      "When on, the root node of the mindmap will be the title of the document."
+    )
+    .addToggle((toggle) =>
+      toggle.setValue(this.plugin.settings.titleAsRootNode).onChange((value) => {
+        this.plugin.settings.titleAsRootNode = value;
+        save();
+      })
+    );
   }
 }

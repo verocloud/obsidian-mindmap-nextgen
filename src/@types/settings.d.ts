@@ -37,4 +37,5 @@ type MindMapSettings = {
   screenshotBgStyle: ScreenshotBgStyle;
   screenshotTransparentBg: boolean;
   highlight: boolean;
+  titleAsRootNode: boolean;
 };
